@@ -43,6 +43,14 @@ html, body, [class*="css"] {
     font-family: 'Inter', sans-serif;
 }
 
+/* ── Prevent auto-scroll on Streamlit rerun ── */
+html {
+    scroll-behavior: auto !important;
+}
+.main .block-container {
+    overflow-anchor: none;
+}
+
 /* ── Hide sidebar ── */
 [data-testid="stSidebar"]        { display: none !important; }
 [data-testid="collapsedControl"] { display: none !important; }
@@ -467,6 +475,9 @@ def init_session():
         "history": [],
         "api_key": GEMINI_API_KEY,
         "key_confirmed": bool(GEMINI_API_KEY),
+        # Sample query state — prevents scroll jump on button click
+        "chat_sample_q": "",
+        "sem_sample_q": "Find cases involving a person using a crowbar at night",
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -591,35 +602,35 @@ def main():
         st.markdown(badge("Engine: Gemini Text-to-SQL + ChromaDB RAG", "blue"), unsafe_allow_html=True)
         st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
 
-        # Sample query buttons
+        # Sample query buttons — use session_state to avoid scroll jump on click
         st.markdown("<div style='font-size:0.82rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.6rem'>Quick Demo Questions</div>", unsafe_allow_html=True)
 
-        sample_q = ""
         q1, q2, q3, q4 = st.columns(4)
         if q1.button("📋  All Robbery Cases", use_container_width=True):
-            sample_q = "Show all robbery cases."
+            st.session_state.chat_sample_q = "Show all robbery cases."
         if q2.button("💻  Cybercrime Count", use_container_width=True):
-            sample_q = "How many cybercrime cases were reported?"
+            st.session_state.chat_sample_q = "How many cybercrime cases were reported?"
         if q3.button("🔓  Unsolved in Chennai", use_container_width=True):
-            sample_q = "Show unsolved cases in Chennai Central."
+            st.session_state.chat_sample_q = "Show unsolved cases in Chennai Central."
         if q4.button("⚡  High Severity 2024", use_container_width=True):
-            sample_q = "Show high severity cases from 2024."
+            st.session_state.chat_sample_q = "Show high severity cases from 2024."
 
         q5, q6, q7 = st.columns(3)
         if q5.button("🔍  Case C102 Details", use_container_width=True):
-            sample_q = "Give me details of case C102."
+            st.session_state.chat_sample_q = "Give me details of case C102."
         if q6.button("📊  Most Common Crime", use_container_width=True):
-            sample_q = "Which crime type is most common?"
+            st.session_state.chat_sample_q = "Which crime type is most common?"
         if q7.button("🏍️  Stolen Motorcycle", use_container_width=True):
-            sample_q = "Find cases involving a stolen motorcycle."
+            st.session_state.chat_sample_q = "Find cases involving a stolen motorcycle."
 
         st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
 
         query_input = st.text_area(
             "Your Question",
-            value=sample_q,
+            value=st.session_state.chat_sample_q,
             placeholder="e.g. Show unsolved robbery cases in T. Nagar with high severity",
             height=90,
+            key="chat_query_area",
             label_visibility="collapsed",
         )
 
@@ -686,30 +697,30 @@ def main():
         st.markdown(badge("Engine: ChromaDB Vector Store · all-MiniLM-L6-v2", "purple"), unsafe_allow_html=True)
         st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
 
-        # Demo semantic queries
+        # Demo semantic queries — session_state prevents scroll jump on click
         st.markdown("<div style='font-size:0.82rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.6rem'>Example Semantic Searches</div>", unsafe_allow_html=True)
 
-        sem_sample = ""
         s1, s2, s3 = st.columns(3)
         if s1.button("🔨  Crowbar night break-in", use_container_width=True):
-            sem_sample = "Find cases involving a person using a crowbar at night"
+            st.session_state.sem_sample_q = "Find cases involving a person using a crowbar at night"
         if s2.button("📹  CCTV evidence", use_container_width=True):
-            sem_sample = "Find cases where CCTV evidence was important"
+            st.session_state.sem_sample_q = "Find cases where CCTV evidence was important"
         if s3.button("🏍️  Stolen motorcycle", use_container_width=True):
-            sem_sample = "Find cases involving a stolen motorcycle"
+            st.session_state.sem_sample_q = "Find cases involving a stolen motorcycle"
 
         s4, s5, _ = st.columns(3)
         if s4.button("💳  Phishing bank fraud", use_container_width=True):
-            sem_sample = "Phishing attack targeting bank accounts"
+            st.session_state.sem_sample_q = "Phishing attack targeting bank accounts"
         if s5.button("🔬  DNA evidence cases", use_container_width=True):
-            sem_sample = "Cases where DNA samples were collected as evidence"
+            st.session_state.sem_sample_q = "Cases where DNA samples were collected as evidence"
 
         st.markdown("<div style='height:0.4rem'></div>", unsafe_allow_html=True)
 
         sem_q = st.text_input(
             "Semantic Query",
-            value=sem_sample or "Find cases involving a person using a crowbar at night",
+            value=st.session_state.sem_sample_q,
             placeholder="Describe the incident, MO, or evidence type...",
+            key="sem_query_input",
             label_visibility="collapsed",
         )
 
