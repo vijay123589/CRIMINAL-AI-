@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Secrets — NEVER commit API keys
+.env
+
+# Database (auto-generated, no need to commit)
+*.db
+*.sqlite
+*.sqlite3
+
+# ChromaDB vector store (auto-generated on first run)
+chroma_store/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
