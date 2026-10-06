@@ -22,6 +22,11 @@ from ml_engine import run_kmeans_clustering, train_random_forest_model, predict_
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Suppress noisy HTTP download logs from libraries
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
+logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
+
 # ════════════════════════════════════════════════════════════════════════════
 #  PAGE CONFIG
 # ════════════════════════════════════════════════════════════════════════════
